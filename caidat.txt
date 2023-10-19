@@ -1,0 +1,15 @@
+npm init
+
+npm i express dotenv bcrypt jsonwebtoken body-parser cors
+
+npm i mongoose
+
+npm i nodemon
+
+npm install bcrypt
+
+npm i bcrypt
+
+npm i jsonwebtoken
+
+npm i cookie-parser
