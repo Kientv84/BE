@@ -135,7 +135,23 @@ const deleteUser = (id) => {
                 message: 'Delete user SUCCESS',
             })
         } catch (error) {
-            console.error('Error generating tokens:', error);
+            reject({
+                status: 'ERR',
+                message: 'Token generation failed'
+            });
+        }
+    })
+}
+
+const deleteManyUser = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await User.deleteMany({_id: ids})
+            resolve({
+                status: 'OK',
+                message: 'Delete user SUCCESS',
+            })
+        } catch (error) {
             reject({
                 status: 'ERR',
                 message: 'Token generation failed'
@@ -197,5 +213,6 @@ module.exports = {
     updateUser,
     deleteUser,
     getAllUser,
-    getDetailsUser
+    getDetailsUser,
+    deleteManyUser,
 }

@@ -115,6 +115,24 @@ const deleteProduct = (id) => {
     })
 }
 
+const deleteManyProduct = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Product.deleteMany({ _id: ids })
+            resolve({
+                status: 'OK',
+                message: 'Delete product SUCCESS',
+            })
+        } catch (error) {
+            console.error('Error generating tokens:', error);
+            reject({
+                status: 'ERR',
+                message: 'Token generation failed'
+            });
+        }
+    })
+}
+
 const getAllProduct = ( limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -169,5 +187,6 @@ module.exports = {
     updateProduct,
     getDetailsProduct,
     deleteProduct,
-    getAllProduct
+    getAllProduct,
+    deleteManyProduct,
 }
