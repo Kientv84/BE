@@ -54,9 +54,9 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             secure: false,
             sameSite: 'strict'
-        // //     path: '/',
+            // //     path: '/',
         })
-        return res.status(200).json({...newReponse})
+        return res.status(200).json({ ...newReponse })
         // const response = await UserService.loginUser(req.body)
         // return res.status(200).json(response)
     } catch (e) {
@@ -70,7 +70,7 @@ const updateUser = async (req, res) => {
     try {
         const userId = req.params.id
         const data = req.body
-        if(!userId){
+        if (!userId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The user id is not exist'
@@ -88,7 +88,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const userId = req.params.id
-        if(!userId){
+        if (!userId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The user id is not exist'
@@ -105,7 +105,7 @@ const deleteUser = async (req, res) => {
 
 const deleteMany = async (req, res) => {
     try {
-        const ids = req.body
+        const ids = req.body.ids
         if (!ids) {
             return res.status(200).json({
                 status: 'ERR',
@@ -135,7 +135,7 @@ const getAllUser = async (req, res) => {
 const getDetailsUser = async (req, res) => {
     try {
         const userId = req.params.id
-        if(!userId){
+        if (!userId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The user id is not exist'
@@ -154,7 +154,7 @@ const refreshToken = async (req, res) => {
     console.log('req.cookies.refresh_token', req.cookies.refresh_token)
     try {
         const token = req.cookies.refresh_token
-        if(!token){
+        if (!token) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The token is required'

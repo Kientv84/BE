@@ -43,7 +43,7 @@ const updateProduct = (id, data) => {
                 })
             }
             // console.log('checkProduct', checkProduct)
-            const updateProduct = await Product.findByIdAndUpdate(id, data, {new : true})
+            const updateProduct = await Product.findByIdAndUpdate(id, data, { new: true })
             console.log('updateUser', updateProduct)
 
             resolve({
@@ -115,7 +115,7 @@ const deleteProduct = (id) => {
     })
 }
 
-const deleteManyProduct = (id) => {
+const deleteManyProduct = (ids) => {
     return new Promise(async (resolve, reject) => {
         try {
             await Product.deleteMany({ _id: ids })
@@ -133,23 +133,23 @@ const deleteManyProduct = (id) => {
     })
 }
 
-const getAllProduct = ( limit, page, sort, filter) => {
+const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.count()
-            if(filter) {
+            if (filter) {
                 const label = filter[0]
-                const allFilterProduct = await Product.find({ [label]: { '$regex': filter[1]} }).limit(limit).skip(limit * page)
+                const allFilterProduct = await Product.find({ [label]: { '$regex': filter[1] } }).limit(limit).skip(limit * page)
                 resolve({
                     status: 'OK',
                     message: 'Filter product SUCCESS',
                     data: allFilterProduct,
                     totalProduct: totalProduct,
                     currentPage: Number(page + 1),
-                    totalPage: Math.ceil( totalProduct / limit)
+                    totalPage: Math.ceil(totalProduct / limit)
                 })
             }
-            if(sort) {
+            if (sort) {
                 const objectSort = {}
                 objectSort[sort[1]] = sort[0]
                 console.log('objectSort', objectSort)
@@ -160,7 +160,7 @@ const getAllProduct = ( limit, page, sort, filter) => {
                     data: allProductSort,
                     totalProduct: totalProduct,
                     currentPage: page + 1,
-                    totalPage: Math.ceil( totalProduct / limit)
+                    totalPage: Math.ceil(totalProduct / limit)
                 })
             }
             const allProduct = await Product.find().limit(limit).skip(limit * page)
@@ -170,7 +170,7 @@ const getAllProduct = ( limit, page, sort, filter) => {
                 data: allProduct,
                 totalProduct: totalProduct,
                 currentPage: page + 1,
-                totalPage: Math.ceil( totalProduct / limit)
+                totalPage: Math.ceil(totalProduct / limit)
             })
         } catch (error) {
             console.error('Error generating tokens:', error);
