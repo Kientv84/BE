@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
 
         // address: { type: String },
         // avatar: { type: String },
-        // city: {type: String}
+        city: { type: String }
     },
     {
         timestamps: true

@@ -19,10 +19,10 @@ const generalRefreshToken = async (payload) => {
 }
 
 const refreshTokenService = (token) => {
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         try {
             jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
-                if(err) {
+                if (err) {
                     resolve({
                         status: 'ERR',
                         message: 'Authentication failed',

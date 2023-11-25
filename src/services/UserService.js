@@ -1,12 +1,11 @@
 const User = require('../models/UserModel');
 const bcrypt = require('bcrypt');
-const { generalRefreshToken, generalAccessToken} = require('./JwtService')
+const { generalRefreshToken, generalAccessToken } = require('./JwtService')
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
         const { name, email, password, confirmPassword, phone } = newUser
         try {
-            
             const checkUser = await User.findOne({
                 email: email
             })
@@ -30,7 +29,7 @@ const createUser = (newUser) => {
                     data: createdUser
                 })
             }
-            console.log(newUser)
+            // console.log(newUser)
         } catch (e) {
             reject(e)
         }
@@ -90,16 +89,16 @@ const updateUser = (id, data) => {
             const checkUser = await User.findById({
                 _id: id
             })
-            console.log('checkUser', checkUser)
+            // console.log('checkUser', checkUser)
             if (checkUser === null) {
                 resolve({
                     status: 'ERR',
                     message: 'The user is not defined'
                 })
             }
-            
-            const updateUser = await User.findByIdAndUpdate(id, data, {new : true})
-            console.log('updateUser', updateUser)
+
+            const updateUser = await User.findByIdAndUpdate(id, data, { new: true })
+            // console.log('updateUser', updateUser)
 
             resolve({
                 status: 'OK',
@@ -128,7 +127,7 @@ const deleteUser = (id) => {
                     message: 'The user is not defined'
                 })
             }
-            
+
             await User.findByIdAndDelete(id)
             resolve({
                 status: 'OK',
@@ -162,7 +161,7 @@ const deleteManyUser = (ids) => {
 const getAllUser = () => {
     return new Promise(async (resolve, reject) => {
         try {
-       
+
             const allUser = await User.find()
             resolve({
                 status: 'OK',

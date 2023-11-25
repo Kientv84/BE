@@ -2,7 +2,7 @@ const Product = require('../models/ProductModel');
 
 const createProduct = (newProduct) => {
     return new Promise(async (resolve, reject) => {
-        const { name, image, type, price, countInStock, rating, description } = newProduct
+        const { name, image, type, price, countInStock, rating, description, discount } = newProduct
         try {
             const checkProduct = await Product.findOne({
                 name: name
@@ -14,7 +14,14 @@ const createProduct = (newProduct) => {
                 })
             }
             const newProduct = await Product.create({
-                name, image, type, price, countInStock, rating, description
+                name,
+                image,
+                type,
+                price,
+                countInStock: Number(countInStock),
+                rating,
+                description,
+                discount: Number(discount)
             })
             if (newProduct) {
                 resolve({
@@ -23,7 +30,6 @@ const createProduct = (newProduct) => {
                     data: newProduct
                 })
             }
-            console.log(newUser)
         } catch (e) {
             reject(e)
         }
@@ -43,8 +49,8 @@ const updateProduct = (id, data) => {
                 })
             }
             // console.log('checkProduct', checkProduct)
-            const updateProduct = await Product.findByIdAndUpdate(id, data, {new : true})
-            console.log('updateUser', updateProduct)
+            const updateProduct = await Product.findByIdAndUpdate(id, data, { new: true })
+            // console.log('updateUser', updateProduct)
 
             resolve({
                 status: 'OK',
@@ -106,7 +112,6 @@ const deleteProduct = (id) => {
                 message: 'Delete product SUCCESS',
             })
         } catch (error) {
-            console.error('Error generating tokens:', error);
             reject({
                 status: 'ERR',
                 message: 'Token generation failed'
@@ -115,26 +120,27 @@ const deleteProduct = (id) => {
     })
 }
 
-const getAllProduct = ( limit, page, sort, filter) => {
+const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.count()
-            if(filter) {
+            let allProduct = []
+            if (filter) {
                 const label = filter[0]
-                const allFilterProduct = await Product.find({ [label]: { '$regex': filter[1]} }).limit(limit).skip(limit * page)
+                const allFilterProduct = await Product.find({ [label]: { '$regex': filter[1] } }).limit(limit).skip(limit * page)
                 resolve({
                     status: 'OK',
                     message: 'Filter product SUCCESS',
                     data: allFilterProduct,
                     totalProduct: totalProduct,
                     currentPage: Number(page + 1),
-                    totalPage: Math.ceil( totalProduct / limit)
+                    totalPage: Math.ceil(totalProduct / limit)
                 })
             }
-            if(sort) {
+            if (sort) {
                 const objectSort = {}
                 objectSort[sort[1]] = sort[0]
-                console.log('objectSort', objectSort)
+                // console.log('objectSort', objectSort)
                 const allProductSort = await Product.find().limit(limit).skip(limit * page).sort(objectSort)
                 resolve({
                     status: 'OK',
@@ -142,17 +148,21 @@ const getAllProduct = ( limit, page, sort, filter) => {
                     data: allProductSort,
                     totalProduct: totalProduct,
                     currentPage: page + 1,
-                    totalPage: Math.ceil( totalProduct / limit)
+                    totalPage: Math.ceil(totalProduct / limit)
                 })
             }
-            const allProduct = await Product.find().limit(limit).skip(limit * page)
+            if (!limit) {
+                allProduct = await Product.find()
+            } else {
+                allProduct = await Product.find().limit(limit).skip(limit * page)
+            }
             resolve({
                 status: 'OK',
                 message: 'Get all product SUCCESS',
                 data: allProduct,
                 totalProduct: totalProduct,
                 currentPage: page + 1,
-                totalPage: Math.ceil( totalProduct / limit)
+                totalPage: Math.ceil(totalProduct / limit)
             })
         } catch (error) {
             console.error('Error generating tokens:', error);

@@ -13,3 +13,5 @@ npm i bcrypt
 npm i jsonwebtoken
 
 npm i cookie-parser
+
+npm rebuild bcrypt --build-from-source

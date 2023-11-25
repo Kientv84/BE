@@ -7,7 +7,7 @@ const authMiddleWare = (req, res, next) => {
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
             console.error('JWT Verification Error:', err);
-            return res.status(404).json({ 
+            return res.status(404).json({
                 status: 'ERROR',
                 message: 'Authentication failed: ' + err.message
             });
@@ -34,7 +34,7 @@ const authUserMiddleWare = (req, res, next) => {
                 message: 'Authentication failed: ' + err.message
             });
         }
-        console.log('Decoded User:', user);
+        // console.log('Decoded User:', user);
         if (user?.isAdmin || user?.id == userId) {
             next()
         } else {
