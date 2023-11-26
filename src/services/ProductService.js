@@ -4,13 +4,6 @@ const createProduct = (newProduct) => {
     return new Promise(async (resolve, reject) => {
         const { name, image, type, price, countInStock, rating, description, discount } = newProduct
         try {
-            // Validate price
-            if (isNaN(price) || price <= 0) {
-                return resolve({
-                    status: 'ERROR',
-                    message: 'Invalid price. Price must be a positive number.',
-                });
-            }
             const checkProduct = await Product.findOne({
                 name: name
             })
