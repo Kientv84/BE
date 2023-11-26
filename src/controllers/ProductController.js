@@ -4,13 +4,26 @@ const createProduct = async (req, res) => {
     try {
         const { name, image, type, price, countInStock, rating, description, discount } = req.body
         // console.log(req.body)
-        if (!name || !image || !type || !price || !countInStock || !rating || !discount) {
+        // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
+        if (
+            typeof name !== 'string' ||
+            typeof image !== 'string' ||
+            typeof type !== 'string' ||
+            typeof description !== 'string' ||
+            typeof price !== 'number' || price <= 0 ||
+            typeof countInStock !== 'number' || countInStock <= 0 ||
+            typeof rating !== 'number' || rating < 0 || rating > 5 ||
+            typeof discount !== 'number' || discount < 0) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Invalid input. Please check your input values.'
+            })
+        } else if (!name || !image || !type || !price || !countInStock || !rating || !discount) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required'
             })
         }
-        // console.log('req.body', req.body)
         const response = await ProductService.createProduct(req.body)
         return res.status(200).json(response)
     } catch (e) {
