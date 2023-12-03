@@ -1,5 +1,6 @@
 const UserService = require('../services/UserService')
 const JwtService = require('../services/JwtService')
+// const imageType = require('image-type');
 
 const createUser = async (req, res) => {
     try {
@@ -70,6 +71,7 @@ const updateUser = async (req, res) => {
     try {
         const userId = req.params.id
         const data = req.body
+        // const avatar = req.body.avatar
         if (!userId) {
             return res.status(200).json({
                 status: 'ERR',
