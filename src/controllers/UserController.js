@@ -19,7 +19,12 @@ const createUser = async (req, res) => {
         } else if (password !== confirmPassword) {
             return res.status(200).json({
                 status: 'ERR',
-                message: 'The password and confirmPassword is not the same'
+                message: 'The password and confirm password is not the same'
+            })
+        } else if (password !== confirmPassword || !isCheckEmail) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The password and confirm password is not the same and the input is not format of an email! '
             })
         }
         const response = await UserService.createUser(req.body)
@@ -49,16 +54,13 @@ const loginUser = async (req, res) => {
         }
         const response = await UserService.loginUser(req.body)
         const { refresh_token, ...newReponse } = response
-        // console.log('newReponse', newReponse)
         res.cookie('refresh_token', refresh_token, {
             httpOnly: true,
             secure: false,
             sameSite: 'strict'
             // //     path: '/',
         })
-        return res.status(200).json({ ...newReponse })
-        // const response = await UserService.loginUser(req.body)
-        // return res.status(200).json(response)
+        return res.status(200).json({ ...newReponse, refresh_token })
     } catch (e) {
         return res.status(404).json({
             message: e
@@ -183,6 +185,10 @@ const deleteMany = async (req, res) => {
     }
 }
 
+const forgotPassword = async (req, res) => {
+
+}
+
 
 module.exports = {
     createUser,
@@ -193,5 +199,6 @@ module.exports = {
     getDetailsUser,
     refreshToken,
     logoutUser,
-    deleteMany
+    deleteMany,
+    forgotPassword
 }

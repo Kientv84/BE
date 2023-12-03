@@ -29,7 +29,6 @@ const createUser = (newUser) => {
                     data: createdUser
                 })
             }
-            // console.log(newUser)
         } catch (e) {
             reject(e)
         }
