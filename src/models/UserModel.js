@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const crypto = require('crypto')
+
 const userSchema = new mongoose.Schema(
     {
         name: { type: String },
@@ -10,14 +12,12 @@ const userSchema = new mongoose.Schema(
         avatar: { type: String },
         // access_token: { type: String, required: true },
         // refresh_token: { type: String, required: true}
-
-        // address: { type: String },
-        // avatar: { type: String },
-        city: { type: String }
+        city: { type: String },
     },
     {
         timestamps: true
     }
 );
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;
