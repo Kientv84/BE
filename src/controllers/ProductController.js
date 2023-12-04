@@ -1,33 +1,62 @@
 const ProductService = require('../services/ProductService')
+const sizeOf = require('image-size');
 
 const createProduct = async (req, res) => {
     try {
-        const { name, image, type, price, countInStock, rating, description, discount } = req.body
-        // console.log(req.body)
+        const { name, image, type, price, countInStock, rating, description, discount } = req.body;
+
+        // // Hàm kiểm tra định dạng ảnh
+        // const isImageValid = (image) => {
+        //     try {
+        //         const dimensions = sizeOf(image);
+        //         // Kiểm tra nếu là file ảnh
+        //         return dimensions.type.startsWith('image');
+        //     } catch (error) {
+        //         // Xử lý lỗi khi đọc kích thước ảnh
+        //         return false;
+        //     }
+        // };
+
+        // // Kiểm tra định dạng ảnh
+        // if (!isImageValid(image)) {
+        //     return res.status(200).json({
+        //         status: 'ERR',
+        //         message: 'Invalid image format. Please upload a valid image file.'
+        //     });
+        // }
+
         // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
-        if (
-            typeof name !== 'string' ||
-            typeof image !== 'string' ||
-            typeof type !== 'string' ||
-            typeof description !== 'string' ||
-            typeof price !== 'number' || price <= 0 ||
-            typeof countInStock !== 'number' || countInStock <= 0 ||
-            typeof rating !== 'number' || rating < 0 || rating > 5 ||
-            typeof discount !== 'number' || discount < 0) {
-            return res.status(200).json({
-                status: 'ERR',
-                message: 'Invalid input. Please check your input values.'
-            })
-        } else if (!name || !image || !type || !price || !countInStock || !rating || !discount) {
-            return res.status(200).json({
-                status: 'ERR',
-                message: 'The input is required'
-            })
+        if (typeof price !== "number" && price < 0) {
+            return res.status(400).json({
+                status: "ERR",
+                message: "Price must be a positive number"
+            });
+        } else if (typeof countInStock !== "number" && countInStock <= 0) {
+            return res.status(400).json({
+                status: "ERR",
+                message: "Quantity in stock must be a positive number"
+            });
+        } else if (typeof rating !== "number" && rating < 0 && rating > 5) {
+            return res.status(400).json({
+                status: "ERR",
+                message: "Rating must be between 0 and 5"
+            });
+        } else if (typeof discount !== "number" && discount < 0) {
+            return res.status(400).json({
+                status: "ERR",
+                message: "Discount must be a positive number"
+            });
         }
-        const response = await ProductService.createProduct(req.body)
-        return res.status(200).json(response)
+        if (!name || !image || !type || !price || !countInStock || !rating || !discount) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'All input fields are required.'
+            });
+        }
+
+        const response = await ProductService.createProduct(req.body);
+        return res.status(200).json(response);
     } catch (e) {
-        // console.log('error')
         return res.status(404).json({
             message: e
         })

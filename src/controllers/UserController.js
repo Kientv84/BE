@@ -49,6 +49,7 @@ const loginUser = async (req, res) => {
             })
         }
         const response = await UserService.loginUser(req.body)
+        // console.log('re', response)
         const { refresh_token, ...newReponse } = response
         // console.log('newReponse', newReponse)
         res.cookie('refresh_token', refresh_token, {
@@ -58,8 +59,6 @@ const loginUser = async (req, res) => {
             // //     path: '/',
         })
         return res.status(200).json({ ...newReponse })
-        // const response = await UserService.loginUser(req.body)
-        // return res.status(200).json(response)
     } catch (e) {
         return res.status(404).json({
             message: e
