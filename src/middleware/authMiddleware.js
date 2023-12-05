@@ -8,7 +8,7 @@ const authMiddleWare = (req, res, next) => {
         if (err) {
             console.error('JWT Verification Error:', err);
             return res.status(404).json({
-                status: 'ERROR',
+                status: 'ERR',
                 message: 'Authentication failed: ' + err.message
             });
         }
@@ -16,8 +16,8 @@ const authMiddleWare = (req, res, next) => {
             next()
         } else {
             return res.status(404).json({
-                message: 'The authemtication',
-                status: 'ERROR'
+                message: 'The authentication',
+                status: 'ERR'
             })
         }
     });
@@ -30,17 +30,16 @@ const authUserMiddleWare = (req, res, next) => {
         if (err) {
             console.error('JWT Verification Error:', err);
             return res.status(404).json({
-                status: 'ERROR',
+                status: 'ERR',
                 message: 'Authentication failed: ' + err.message
             });
         }
-        // console.log('Decoded User:', user);
-        if (user?.isAdmin || user?.id == userId) {
+        if (user?.isAdmin || user?.id === userId) {
             next()
         } else {
             return res.status(404).json({
-                message: 'The authemtication',
-                status: 'ERROR'
+                message: 'The authentication',
+                status: 'ERR'
             })
         }
     });
