@@ -1,6 +1,7 @@
 const User = require('../models/UserModel');
 const bcrypt = require('bcrypt');
 const { generalRefreshToken, generalAccessToken } = require('./JwtService')
+const mailer = require('../Utils/mailer')
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {

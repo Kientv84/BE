@@ -35,8 +35,6 @@ const createOrder = (newOrder) => {
                 }
             })
             const results = await Promise.all(promises)
-            // console.log('promis', promises)
-            // console.log('results', results)
             const newData = results && results.filter((item) => item.id)
             if (newData.length) {
                 const arrId = []
