@@ -1,5 +1,11 @@
 const UserService = require('../services/UserService')
 const JwtService = require('../services/JwtService')
+const User = require('../models/UserModel')
+const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+require('dotenv').config
+// const imageType = require('image-type');
 
 const createUser = async (req, res) => {
     try {
@@ -19,7 +25,12 @@ const createUser = async (req, res) => {
         } else if (password !== confirmPassword) {
             return res.status(200).json({
                 status: 'ERR',
-                message: 'The password and confirmPassword is not the same'
+                message: 'The password and confirm password is not the same'
+            })
+        } else if (password?.length < 8) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Password should be at least 8 characters long'
             })
         }
         const response = await UserService.createUser(req.body)
@@ -49,16 +60,13 @@ const loginUser = async (req, res) => {
         }
         const response = await UserService.loginUser(req.body)
         const { refresh_token, ...newReponse } = response
-        // console.log('newReponse', newReponse)
         res.cookie('refresh_token', refresh_token, {
             httpOnly: true,
             secure: false,
             sameSite: 'strict'
             // //     path: '/',
         })
-        return res.status(200).json({ ...newReponse })
-        // const response = await UserService.loginUser(req.body)
-        // return res.status(200).json(response)
+        return res.status(200).json({ ...newReponse, refresh_token })
     } catch (e) {
         return res.status(404).json({
             message: e
@@ -70,6 +78,7 @@ const updateUser = async (req, res) => {
     try {
         const userId = req.params.id
         const data = req.body
+        // const avatar = req.body.avatar
         if (!userId) {
             return res.status(200).json({
                 status: 'ERR',
@@ -183,6 +192,95 @@ const deleteMany = async (req, res) => {
     }
 }
 
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    const emailRegex = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    const isEmailValid = emailRegex.test(email);
+    if (!email) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'The input is required'
+        })
+    } else if (!isEmailValid) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'The input is not in the format of an email!'
+        });
+    }
+    try {
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The email does not exist'
+            });
+        }
+
+        const token = jwt.sign({ id: user._id }, "jwt_secret_key", { expiresIn: "1d" });
+
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.MAIL_ACCOUNT,
+                pass: process.env.MAIL_PASSWORD
+            }
+        });
+
+        var mailOptions = {
+            from: process.env.MAIL_ACCOUNT,
+            to: user?.email,
+            subject: 'Reset Password Link',
+            text: `Verify to Reset Password: http://localhost:3000/reset-password/${user._id}/${token}`
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                // console.log(error);
+                return res.status(404).json({ status: 'ERR', message: 'Failed to send email' });
+            } else {
+                return res.send({ status: "Success" });
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(404).json({ status: 'ERR', message: 'Internal server error' });
+    }
+};
+
+
+const resetPassword = async (req, res) => {
+    const { id, token } = req.params
+    const { password } = req.body
+    // Kiểm tra độ dài mật khẩu
+    if (!password) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'The input is required'
+        })
+    } else if (password?.length < 8) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'Password should be at least 8 characters long'
+        })
+    }
+    jwt.verify(token, "jwt_secret_key", (err, decoded) => {
+        if (err) {
+            return res.json({ status: "Error with token" })
+        } else {
+            bcrypt.hash(password, 10)
+                .then(hash => {
+                    User.findByIdAndUpdate({ _id: id }, { password: hash })
+                        .then(u => res.send({ status: "Success" }))
+                        .catch(err => res.send({ status: err }))
+                })
+                .catch(err => res.send({ Status: err }))
+        }
+    })
+
+}
+
+
 
 module.exports = {
     createUser,
@@ -193,5 +291,7 @@ module.exports = {
     getDetailsUser,
     refreshToken,
     logoutUser,
-    deleteMany
+    deleteMany,
+    forgotPassword,
+    resetPassword,
 }

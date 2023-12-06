@@ -1,12 +1,11 @@
 const Order = require('../models/OrderProduct');
 const Product = require('../models/ProductModel');
+const EmailService = require('../services/EmailService')
 
 const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
-        // console.log('newOrder', newOrder)
-        const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user, isPaid, paidAt } = newOrder
+        const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user, isPaid, paidAt, email } = newOrder
         try {
-            // console.log('orderItems', { orderItems })
             const promises = orderItems.map(async (order) => {
                 const productData = await Product.findOneAndUpdate(
                     {
@@ -22,48 +21,53 @@ const createOrder = (newOrder) => {
                     { new: true }
                 )
                 if (productData) {
-                    const createdOrder = await Order.create({
-                        orderItems,
-                        shippingAddress: {
-                            fullName,
-                            address,
-                            city,
-                            phone
-                        },
-                        paymentMethod,
-                        itemsPrice,
-                        shippingPrice,
-                        totalPrice,
-                        user: user,
-                        isPaid,
-                        paidAt
-                    })
-                    if (createdOrder) {
-                        return {
-                            status: 'OK',
-                            message: 'SUCCESS',
-                        }
+                    return {
+                        status: 'OK',
+                        message: 'SUCCESS'
                     }
-                } else {
+                }
+                else {
                     return {
                         status: 'OK',
                         message: 'ERR',
-                        data: [order.product]
+                        id: order.product
                     }
                 }
             })
             const results = await Promise.all(promises)
             const newData = results && results.filter((item) => item.id)
             if (newData.length) {
-                resolve({
-                    status: 'OK',
-                    message: `Sản phẩm id${newData.join(',')} không đủ hàng trong kho`
+                const arrId = []
+                newData.forEach((item) => {
+                    arrId.push(item.id)
                 })
+                resolve({
+                    status: 'ERR',
+                    message: `San pham voi id: ${arrId.join(',')} khong du hang`
+                })
+            } else {
+                const createdOrder = await Order.create({
+                    orderItems,
+                    shippingAddress: {
+                        fullName,
+                        address,
+                        city, phone
+                    },
+                    paymentMethod,
+                    itemsPrice,
+                    shippingPrice,
+                    totalPrice,
+                    user: user,
+                    isPaid, paidAt
+                })
+                if (createdOrder) {
+                    await EmailService.sendEmailCreateOrder(email, orderItems)
+                    resolve({
+                        status: 'OK',
+                        message: 'success'
+                    })
+                }
             }
-            resolve({
-                status: 'OK',
-                message: 'Success'
-            })
         } catch (e) {
             reject(e)
         }
@@ -187,9 +191,30 @@ const cancelOrderDetails = (id, data) => {
     })
 }
 
+const getAllOrder = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            const allOrder = await Order.find()
+            resolve({
+                status: 'OK',
+                message: 'Get all order SUCCESS',
+                data: allOrder
+            })
+        } catch (error) {
+            console.error('Error generating tokens:', error);
+            reject({
+                status: 'ERR',
+                message: 'Token generation failed'
+            });
+        }
+    })
+}
+
 module.exports = {
     createOrder,
     getAllDetailsOrder,
     getDetailsOrder,
-    cancelOrderDetails
+    cancelOrderDetails,
+    getAllOrder
 }

@@ -3,6 +3,7 @@ const OrderService = require('../services/OrderService')
 const createOrder = async (req, res) => {
     try {
         const { paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone } = req.body
+        // console.log('req,body', req.body)
         if (!paymentMethod || !itemsPrice || shippingPrice == null || !totalPrice || !fullName || !address || !city || !phone) {
             return res.status(200).json({
                 status: 'ERR',
@@ -12,7 +13,7 @@ const createOrder = async (req, res) => {
         const response = await OrderService.createOrder(req.body)
         return res.status(200).json(response)
     } catch (e) {
-        console.log('error')
+        // console.log('error')
         return res.status(404).json({
             message: e
         })
@@ -75,9 +76,21 @@ const cancelOrderDetails = async (req, res) => {
     }
 }
 
+const getAllOrder = async (req, res) => {
+    try {
+        const data = await OrderService.getAllOrder()
+        return res.status(200).json(data)
+    } catch (e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 module.exports = {
     createOrder,
     getAllDetailsOrder,
     getDetailsOrder,
-    cancelOrderDetails
+    cancelOrderDetails,
+    getAllOrder
 }
