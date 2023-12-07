@@ -2,12 +2,14 @@ const ProductService = require('../services/ProductService')
 
 const createProduct = async (req, res) => {
     try {
-        const { name, image, type, price, countInStock, rating, description, discount } = req.body
+        const { name, image, type, price, countInStock, rating, description, discount, image1, image2 } = req.body
         // console.log(req.body)
         // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
         if (
             typeof name !== 'string' ||
             typeof image !== 'string' ||
+            typeof image1 !== 'string' ||
+            typeof image2 !== 'string' ||
             typeof type !== 'string' ||
             typeof description !== 'string' ||
             typeof price !== 'number' || price <= 0 ||
@@ -18,7 +20,7 @@ const createProduct = async (req, res) => {
                 status: 'ERR',
                 message: 'Invalid input. Please check your input values.'
             })
-        } else if (!name || !image || !type || !price || !countInStock || !rating || !discount) {
+        } else if (!name || !image || !image1 || !image2 || !type || !price || !countInStock || !rating || !discount) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required'
