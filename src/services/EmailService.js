@@ -1,7 +1,9 @@
 const nodemailer = require("nodemailer");
 const dotenv = require('dotenv');
+const { convertPrice } = require('../Utils/utils')
 
 dotenv.config()
+var inlineBase64 = require('nodemailer-plugin-inline-base64');
 
 const sendEmailCreateOrder = (email, orderItems) => {
     const transporter = nodemailer.createTransport({
@@ -14,14 +16,17 @@ const sendEmailCreateOrder = (email, orderItems) => {
             pass: process.env.MAIL_PASSWORD,
         }
     });
+    transporter.use('compile', inlineBase64({ cidPrefix: 'somePrefix_' }));
 
     let listItems = ''
+    const attachImage = []
     orderItems.forEach((order) => {
         listItems +=
             `<div> 
-        <div>Bạn đã đặt các sản phẩm <b>${order.name}</b> với số lượng <b>${order.amount}</b> với giá <b>${order.price} VNĐ</b> </div>
-        <div> <img src=${order.image} alt="sản phẩm"/> 
+        <div>You ordered <b>${order.name}</b> products in quantity <b>${order.amount}</b> with price <b>${convertPrice(order.price)}</b> </div>
+        <div>Below are images of the product</div>
         </div>`
+        attachImage.push({ path: order.image })
     })
 
     // async..await is not allowed in global scope, must use a wrapper
@@ -29,10 +34,11 @@ const sendEmailCreateOrder = (email, orderItems) => {
         // send mail with defined transport object
         const info = await transporter.sendMail({
             from: process.env.MAIL_ACCOUNT, // sender address
-            to: "hvo0512@gmail.com", // list of receivers
-            subject: "Bạn đã đặt hàng thành công tại WEBPHONE", // Subject line
+            to: email, // list of receivers
+            subject: "You have successfully placed an order at WEBPHONE", // Subject line
             text: "Hello world?", // plain text body
-            html: `<div><b>Chúc mừng bạn đã đặt hàng thành công</b></div> ${listItems}`, // html body
+            html: `<div><b>Congratulations on your successful order</b></div> ${listItems}`, // html body
+            attachments: attachImage,
         });
 
         // console.log("Message sent: %s", info.messageId);

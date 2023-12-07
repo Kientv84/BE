@@ -13,11 +13,13 @@ const userSchema = new mongoose.Schema(
         // access_token: { type: String, required: true },
         // refresh_token: { type: String, required: true}
         city: { type: String },
+        email_verified_at: { type: Date, default: null }
     },
     {
         timestamps: true
     }
 );
-
 const User = mongoose.model("User", userSchema);
+
+
 module.exports = User;

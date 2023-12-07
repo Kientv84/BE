@@ -27,6 +27,11 @@ const createUser = async (req, res) => {
                 status: 'ERR',
                 message: 'The password and confirm password is not the same'
             })
+        } else if (password?.length < 8) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Password should be at least 8 characters long'
+            })
         }
         const response = await UserService.createUser(req.body)
         return res.status(200).json(response)
@@ -188,55 +193,16 @@ const deleteMany = async (req, res) => {
     }
 }
 
-// const forgotPassword = async (req, res) => {
-//     const { email } = req.body;
-//     const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
-//     const isCheckEmail = reg.test(email)
-//     User.findOne({ email: email })
-//         .then(user => {
-//             if (!user) {
-//                 return res.status(200).json({
-//                     status: 'ERR',
-//                     message: 'The email is not exist'
-//                 })
-//             } else if (!isCheckEmail) {
-//                 return res.status(200).json({
-//                     status: 'ERR',
-//                     message: 'The input is not format of an email!'
-//                 })
-//             }
-//             const token = jwt.sign({ id: user._id }, "jwt_secret_key", { expiresIn: "1d" })
-//             var transporter = nodemailer.createTransport({
-//                 service: 'gmail',
-//                 auth: {
-//                     user: process.env.MAIL_ACCOUNT,
-//                     pass: process.env.MAIL_PASSWORD
-//                 }
-//             });
-
-//             var mailOptions = {
-//                 from: process.env.MAIL_ACCOUNT,
-//                 to: user?.email,
-//                 subject: 'Reset Password Link',
-//                 text: `Verify to Reset Password: http://localhost:3000/reset-password/${user._id}/${token}`
-//             };
-
-//             transporter.sendMail(mailOptions, function (error, info) {
-//                 if (error) {
-//                     console.log(error);
-//                 } else {
-//                     return res.send({ status: "Success" })
-//                 }
-//             })
-//         })
-// }
-
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     const emailRegex = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
     const isEmailValid = emailRegex.test(email);
-
-    if (!isEmailValid) {
+    if (!email) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'The input is required'
+        })
+    } else if (!isEmailValid) {
         return res.status(200).json({
             status: 'ERR',
             message: 'The input is not in the format of an email!'
@@ -271,7 +237,7 @@ const forgotPassword = async (req, res) => {
 
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
-                console.log(error);
+                // console.log(error);
                 return res.status(404).json({ status: 'ERR', message: 'Failed to send email' });
             } else {
                 return res.send({ status: "Success" });
@@ -287,7 +253,18 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     const { id, token } = req.params
     const { password } = req.body
-
+    // Kiểm tra độ dài mật khẩu
+    if (!password) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'The input is required'
+        })
+    } else if (password?.length < 8) {
+        return res.status(200).json({
+            status: 'ERR',
+            message: 'Password should be at least 8 characters long'
+        })
+    }
     jwt.verify(token, "jwt_secret_key", (err, decoded) => {
         if (err) {
             return res.json({ status: "Error with token" })
@@ -305,6 +282,7 @@ const resetPassword = async (req, res) => {
 }
 
 
+
 module.exports = {
     createUser,
     loginUser,
@@ -316,5 +294,5 @@ module.exports = {
     logoutUser,
     deleteMany,
     forgotPassword,
-    resetPassword
+    resetPassword,
 }
