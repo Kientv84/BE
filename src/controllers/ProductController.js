@@ -2,7 +2,7 @@ const ProductService = require('../services/ProductService')
 
 const createProduct = async (req, res) => {
     try {
-        const { name, image, type, price, countInStock, rating, description, discount, image1, image2 } = req.body
+        const { name, image, type, price, countInStock, rating, description, promotion, discount, image1, image2 } = req.body
         // console.log(req.body)
         // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
         if (
@@ -12,6 +12,7 @@ const createProduct = async (req, res) => {
             typeof image2 !== 'string' ||
             typeof type !== 'string' ||
             typeof description !== 'string' ||
+            typeof promotion !== 'string' ||
             typeof price !== 'number' || price <= 0 ||
             typeof countInStock !== 'number' || countInStock <= 0 ||
             typeof rating !== 'number' || rating < 0 || rating > 5 ||
