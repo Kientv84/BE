@@ -93,10 +93,9 @@ const getAllDetailsOrder = (id) => {
                 data: order
             })
         } catch (error) {
-            console.error('Error generating tokens:', error);
             reject({
                 status: 'ERR',
-                message: 'Token generation failed'
+                message: error
             });
         }
     })
@@ -124,7 +123,7 @@ const getDetailsOrder = (id) => {
             console.error('Error generating tokens:', error);
             reject({
                 status: 'ERR',
-                message: 'Token generation failed'
+                message: error
             });
         }
     })
@@ -185,7 +184,7 @@ const cancelOrderDetails = (id, data) => {
         } catch (error) {
             reject({
                 status: 'ERR',
-                message: 'Token generation failed'
+                message: error
             });
         }
     })
@@ -205,7 +204,7 @@ const getAllOrder = () => {
             console.error('Error generating tokens:', error);
             reject({
                 status: 'ERR',
-                message: 'Token generation failed'
+                message: error
             });
         }
     })
@@ -240,11 +239,83 @@ const updateDeliveryState = (orderId, data) => {
     })
 }
 
+const updatePaymentState = (orderId, data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const checkOrder = await Order.findById({
+                _id: orderId
+            })
+            if (checkOrder === null) {
+                resolve({
+                    status: 'ERR',
+                    message: 'The order is not defined'
+                })
+            }
+            const updateOrder = await Order.findByIdAndUpdate(orderId, data, { new: true })
+            // console.log('updateOrder', updateOrder)
+
+            resolve({
+                status: 'OK',
+                message: 'SUCCESS',
+                data: updateOrder
+            })
+        } catch (error) {
+            reject({
+                status: 'ERR',
+                message: error
+            });
+        }
+    })
+}
+
+const deleteOrder = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const checkOrder = await Order.findById({
+                _id: id
+            })
+            if (checkOrder === null) {
+                resolve({
+                    status: 'ERR',
+                    message: 'The order is not defined'
+                })
+            }
+            await Order.findByIdAndDelete(id)
+            resolve({
+                status: 'OK',
+                message: 'Delete order SUCCESS',
+            })
+        } catch (error) {
+            reject({
+                status: 'ERR',
+                message: error
+            });
+        }
+    })
+}
+
+const deleteManyOrder = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Order.deleteMany({ _id: ids })
+            resolve({
+                status: 'OK',
+                message: 'Delete orders success',
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     createOrder,
     getAllDetailsOrder,
     getDetailsOrder,
     cancelOrderDetails,
     getAllOrder,
-    updateDeliveryState
+    updateDeliveryState,
+    updatePaymentState,
+    deleteOrder,
+    deleteManyOrder
 }
