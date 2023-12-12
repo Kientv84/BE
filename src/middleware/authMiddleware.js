@@ -8,7 +8,7 @@ const authMiddleWare = (req, res, next) => {
         if (err) {
             console.error('JWT Verification Error:', err);
             return res.status(404).json({
-                status: 'ERR',
+                status: 'ERROR',
                 message: 'Authentication failed: ' + err.message
             });
         }
@@ -16,8 +16,8 @@ const authMiddleWare = (req, res, next) => {
             next()
         } else {
             return res.status(404).json({
-                message: 'The authentication',
-                status: 'ERR'
+                message: 'The authemtication',
+                status: 'ERROR'
             })
         }
     });
