@@ -3,8 +3,7 @@ const sizeOf = require('image-size');
 
 const createProduct = async (req, res) => {
     try {
-        const { name, image, type, price, countInStock, rating, description, discount } = req.body;
-
+        const { name, image, type, price, countInStock, rating, description, promotion, discount, image1, image2 } = req.body;
         // // Hàm kiểm tra định dạng ảnh
         // const isImageValid = (image) => {
         //     try {
@@ -25,29 +24,29 @@ const createProduct = async (req, res) => {
         //     });
         // }
 
-        // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
-        if (typeof price !== "number" && price < 0) {
-            return res.status(400).json({
-                status: "ERR",
-                message: "Price must be a positive number"
-            });
-        } else if (typeof countInStock !== "number" && countInStock <= 0) {
-            return res.status(400).json({
-                status: "ERR",
-                message: "Quantity in stock must be a positive number"
-            });
-        } else if (typeof rating !== "number" && rating < 0 && rating > 5) {
-            return res.status(400).json({
-                status: "ERR",
-                message: "Rating must be between 0 and 5"
-            });
-        } else if (typeof discount !== "number" && discount < 0) {
-            return res.status(400).json({
-                status: "ERR",
-                message: "Discount must be a positive number"
-            });
-        }
-        if (!name || !image || !type || !price || !countInStock || !rating || !discount) {
+        // // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
+        // if (price < 0) {
+        //     return res.status(200).json({
+        //         status: "ERR",
+        //         message: "Price must be a positive number"
+        //     });
+        // } else if (countInStock <= 0) {
+        //     return res.status(200).json({
+        //         status: "ERR",
+        //         message: "Quantity in stock must be a positive number"
+        //     });
+        // } else if (rating < 0 || rating > 5) {
+        //     return res.status(200).json({
+        //         status: "ERR",
+        //         message: "Rating must be between 0 and 5"
+        //     });
+        // } else if (discount < 0) {
+        //     return res.status(200).json({
+        //         status: "ERR",
+        //         message: "Discount must be a positive number"
+        //     });
+        // }
+        if (!name || !image || !type || !price || !countInStock || !rating || !discount || !description || !promotion || !image1 || !image2) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'All input fields are required.'
