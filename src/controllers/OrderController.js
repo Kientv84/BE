@@ -98,7 +98,7 @@ const updateDeliveryState = async (req, res) => {
             })
         }
         const response = await OrderService.updateDeliveryState(orderId, data)
-        console.log(response)
+        // console.log(response)
         return res.status(200).json(response)
     } catch (e) {
         return res.status(404).json({
@@ -118,7 +118,7 @@ const updatePaymentState = async (req, res) => {
             })
         }
         const response = await OrderService.updatePaymentState(orderId, data)
-        console.log(response)
+        // console.log(response)
         return res.status(200).json(response)
     } catch (e) {
         return res.status(404).json({
@@ -130,7 +130,7 @@ const updatePaymentState = async (req, res) => {
 const deleteOrder = async (req, res) => {
     try {
         const orderId = req.params.id
-        console.log(orderId)
+        // console.log(orderId)
         if (!orderId) {
             return res.status(200).json({
                 status: 'ERR',
