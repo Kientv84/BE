@@ -123,59 +123,104 @@ const deleteProduct = (id) => {
     })
 }
 
-const getAllProduct = (limit, page, sort, filter) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const totalProduct = await Product.count()
-            let allProduct = []
-            if (filter) {
-                const label = filter[0]
-                const allFilterProduct = await Product.find({ [label]: { '$regex': filter[1] } }).limit(limit).skip(limit * page)
-                resolve({
-                    status: 'OK',
-                    message: 'Filter product SUCCESS',
-                    data: allFilterProduct,
-                    totalProduct: totalProduct,
-                    currentPage: Number(page + 1),
-                    totalPage: Math.ceil(totalProduct / limit)
-                })
-            }
-            if (sort) {
-                const objectSort = {}
-                objectSort[sort[1]] = sort[0]
-                // console.log('objectSort', objectSort)
-                const allProductSort = await Product.find().limit(limit).skip(limit * page).sort(objectSort)
-                resolve({
-                    status: 'OK',
-                    message: 'Get all product SUCCESS',
-                    data: allProductSort,
-                    totalProduct: totalProduct,
-                    currentPage: page + 1,
-                    totalPage: Math.ceil(totalProduct / limit)
-                })
-            }
-            if (!limit) {
-                allProduct = await Product.find()
-            } else {
-                allProduct = await Product.find().limit(limit).skip(limit * page)
-            }
-            resolve({
-                status: 'OK',
-                message: 'Get all product SUCCESS',
-                data: allProduct,
-                totalProduct: totalProduct,
-                currentPage: page + 1,
-                totalPage: Math.ceil(totalProduct / limit)
-            })
-        } catch (error) {
-            console.error('Error generating tokens:', error);
-            reject({
-                status: 'ERR',
-                message: 'Token generation failed'
-            });
+// const getAllProduct = (limit, page, sort, filter) => {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             const totalProduct = await Product.count()
+//             let allProduct = []
+//             if (filter) {
+//                 const label = filter[0]
+//                 const allFilterProduct = await Product.find({ [label]: { '$regex': filter[1] } }).limit(limit).skip(limit * page).sort({ createdAt: -1, updatedAt: -1 })
+//                 resolve({
+//                     status: 'OK',
+//                     message: 'Filter product SUCCESS',
+//                     data: allFilterProduct,
+//                     totalProduct: totalProduct,
+//                     currentPage: Number(page + 1),
+//                     totalPage: Math.ceil(totalProduct / limit)
+//                 })
+//             }
+//             if (sort) {
+//                 const objectSort = {}
+//                 objectSort[sort[1]] = sort[0]
+//                 const allProductSort = await Product.find().limit(limit).skip(limit * page).sort(objectSort).sort({ createdAt: -1, updatedAt: -1 })
+//                 resolve({
+//                     status: 'OK',
+//                     message: 'Get all product SUCCESS',
+//                     data: allProductSort,
+//                     totalProduct: totalProduct,
+//                     currentPage: page + 1,
+//                     totalPage: Math.ceil(totalProduct / limit)
+//                 })
+//             }
+//             if (!limit) {
+//                 allProduct = await Product.find().sort({ createdAt: -1, updatedAt: -1 })
+//             } else {
+//                 allProduct = await Product.find().limit(limit).skip(limit * page).sort({ createdAt: -1, updatedAt: -1 })
+//             }
+//             resolve({
+//                 status: 'OK',
+//                 message: 'Get all product SUCCESS',
+//                 data: allProduct,
+//                 totalProduct: totalProduct,
+//                 currentPage: page + 1,
+//                 totalPage: Math.ceil(totalProduct / limit)
+//             })
+//         } catch (error) {
+//             console.error('Error generating tokens:', error);
+//             throw error;
+//         }
+//     })
+// }
+
+
+const getAllProduct = async (limit, page, sort, filter) => {
+    try {
+        const query = Product.find();
+
+        // Apply filtering
+        if (filter) {
+            const [label, value] = filter;
+            query.find({ [label]: { $regex: value } });
         }
-    })
-}
+
+        // Apply sorting
+        if (sort) {
+            const [sortOrder, sortField] = sort;
+            const sortObject = { [sortField]: sortOrder };
+            query.sort(sortObject);
+        }
+
+        // Apply pagination
+        if (limit && page) {
+            const skipAmount = limit * (page - 1);
+            query.skip(skipAmount).limit(limit);
+        }
+
+        const [allProduct, totalProduct] = await Promise.all([
+            query.lean().select('_id name image price rating discount type selled').exec(),
+            Product.countDocuments().exec()
+        ]);
+
+        return {
+            status: 'OK',
+            message: 'Get all product SUCCESS',
+            data: allProduct,
+            totalProduct,
+            currentPage: page + 1,
+            totalPage: Math.ceil(totalProduct / limit),
+        };
+    } catch (error) {
+        console.error('Error generating tokens:', error);
+        throw error;
+    }
+};
+
+
+
+
+
+
 
 const deleteManyProduct = (ids) => {
     return new Promise(async (resolve, reject) => {

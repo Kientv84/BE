@@ -15,3 +15,6 @@ npm i jsonwebtoken
 npm i cookie-parser
 
 npm rebuild bcrypt --build-from-source
+
+rm -rf node_modules
+npm install
