@@ -161,7 +161,7 @@ const getAllUser = () => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            const allUser = await User.find()
+            const allUser = await User.find().select('_id name email phone address')
             resolve({
                 status: 'OK',
                 message: 'Get all use SUCCESS',

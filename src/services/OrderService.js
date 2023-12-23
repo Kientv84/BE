@@ -195,6 +195,7 @@ const getAllOrder = () => {
         try {
 
             const allOrder = await Order.find()
+                .select('_id shippingAddress paymentMethod totalPrice isPaid isDelivered')
             resolve({
                 status: 'OK',
                 message: 'Get all order SUCCESS',
@@ -215,7 +216,7 @@ const updateDeliveryState = (orderId, data) => {
         try {
             const checkOrder = await Order.findById({
                 _id: orderId
-            })
+            }).select('_id isPaid isDelivered')
             if (checkOrder === null) {
                 resolve({
                     status: 'ERR',
@@ -228,7 +229,10 @@ const updateDeliveryState = (orderId, data) => {
             resolve({
                 status: 'OK',
                 message: 'SUCCESS',
-                data: updateOrder
+                data: {
+                    isDelivered: updateOrder.isDelivered,
+                    isPaid: updateOrder.isPaid
+                }
             })
         } catch (error) {
             reject({
@@ -257,7 +261,7 @@ const updatePaymentState = (orderId, data) => {
             resolve({
                 status: 'OK',
                 message: 'SUCCESS',
-                data: updateOrder
+                data: { isPaid: updateOrder.isPaid }
             })
         } catch (error) {
             reject({
@@ -273,7 +277,7 @@ const deleteOrder = (id) => {
         try {
             const checkOrder = await Order.findById({
                 _id: id
-            })
+            }).select('_id isPaid isDelivered')
             if (checkOrder === null) {
                 resolve({
                     status: 'ERR',

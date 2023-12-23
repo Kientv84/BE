@@ -173,7 +173,6 @@ const deleteProduct = (id) => {
 //     })
 // }
 
-
 const getAllProduct = async (limit, page, sort, filter) => {
     try {
         const query = Product.find();
@@ -215,12 +214,6 @@ const getAllProduct = async (limit, page, sort, filter) => {
         throw error;
     }
 };
-
-
-
-
-
-
 
 const deleteManyProduct = (ids) => {
     return new Promise(async (resolve, reject) => {
