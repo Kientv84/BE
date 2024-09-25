@@ -1,4 +1,8 @@
-const { generalAccessToken2 } = require("../services/JwtService");
+const {
+  generalAccessToken2,
+  generalAccessToken,
+  generalRefreshToken,
+} = require("../services/JwtService");
 const UserService = require("../services/UserService");
 
 const loginSuccess = async (req, res) => {
@@ -16,15 +20,26 @@ const loginSuccess = async (req, res) => {
 
     // Nếu người dùng tồn tại, trả về thông tin và token
     if (user.status === "OK") {
-      const access_token = await generalAccessToken2({
+      const access_token = await generalAccessToken({
         id: user.data._id,
         isAdmin: user.data.isAdmin,
+      });
+      const refresh_token = await generalRefreshToken({
+        id: user.data._id,
+        isAdmin: user.data.isAdmin,
+      });
+
+      res.cookie("refresh_token", refresh_token, {
+        httpOnly: true,
+        secure: false, // Thay đổi thành true nếu triển khai trên HTTPS
+        sameSite: "strict",
       });
 
       return res.status(200).json({
         status: "OK",
         msg: "Login success",
         access_token,
+        refresh_token,
       });
     }
 
