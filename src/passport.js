@@ -1,4 +1,5 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
 require("dotenv").config();
 const passport = require("passport");
 const User = require("./models/UserModel");
@@ -31,6 +32,40 @@ passport.use(
         return callback(null, user);
       } catch (error) {
         console.error("Error during Google login:", error);
+        return callback(error, null);
+      }
+    }
+  )
+);
+
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_APP_ID,
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+      callbackURL: "/api/auth/facebook/callback",
+      profileFields: ["email", "photos", "displayName", "id"],
+    },
+    async function (accessToken, refreshToken, profile, callback) {
+      try {
+        // Kiểm tra xem user có tồn tại không bằng email
+        let user = await User.findOne({ email: profile.emails[0]?.value });
+        // Kiểm tra xem user có tồn tại hay không và cập nhật/thêm mới
+        if (!user) {
+          user = new User({
+            // googleId: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0]?.value,
+            password: bcrypt.hashSync(Math.random().toString(36).slice(-8), 10), // Tạo mật khẩu ngẫu nhiên và hash
+            isAdmin: false,
+            avatar: profile?.photos[0]?.value,
+          });
+
+          await user.save();
+        }
+        return callback(null, user);
+      } catch (error) {
+        console.error("Error during Facebook login:", error);
         return callback(error, null);
       }
     }
