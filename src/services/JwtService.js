@@ -8,19 +8,7 @@ const generalAccessToken = async (payload) => {
       ...payload,
     },
     process.env.ACCESS_TOKEN,
-    { expiresIn: "30s" }
-  );
-
-  return access_token;
-};
-
-const generalAccessToken2 = async (payload) => {
-  const access_token = jwt.sign(
-    {
-      ...payload,
-    },
-    process.env.ACCESS_TOKEN,
-    { expiresIn: "365d" }
+    { expiresIn: "5s" }
   );
 
   return access_token;
@@ -72,5 +60,4 @@ module.exports = {
   generalAccessToken,
   generalRefreshToken,
   refreshTokenService,
-  generalAccessToken2,
 };
