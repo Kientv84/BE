@@ -1,5 +1,4 @@
 const {
-  generalAccessToken2,
   generalAccessToken,
   generalRefreshToken,
 } = require("../services/JwtService");
