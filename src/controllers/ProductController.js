@@ -17,48 +17,7 @@ const createProduct = async (req, res) => {
       image1,
       image2,
     } = req.body;
-    // // Hàm kiểm tra định dạng ảnh
-    // const isImageValid = (image) => {
-    //     try {
-    //         const dimensions = sizeOf(image);
-    //         // Kiểm tra nếu là file ảnh
-    //         return dimensions.type.startsWith('image');
-    //     } catch (error) {
-    //         // Xử lý lỗi khi đọc kích thước ảnh
-    //         return false;
-    //     }
-    // };
 
-    // // Kiểm tra định dạng ảnh
-    // if (!isImageValid(image)) {
-    //     return res.status(200).json({
-    //         status: 'ERR',
-    //         message: 'Invalid image format. Please upload a valid image file.'
-    //     });
-    // }
-
-    // // Kiểm tra nếu bất kỳ trường nào là chuỗi hoặc số âm
-    // if (price < 0) {
-    //     return res.status(200).json({
-    //         status: "ERR",
-    //         message: "Price must be a positive number"
-    //     });
-    // } else if (countInStock <= 0) {
-    //     return res.status(200).json({
-    //         status: "ERR",
-    //         message: "Quantity in stock must be a positive number"
-    //     });
-    // } else if (rating < 0 || rating > 5) {
-    //     return res.status(200).json({
-    //         status: "ERR",
-    //         message: "Rating must be between 0 and 5"
-    //     });
-    // } else if (discount < 0) {
-    //     return res.status(200).json({
-    //         status: "ERR",
-    //         message: "Discount must be a positive number"
-    //     });
-    // }
     if (
       !name ||
       !image ||
