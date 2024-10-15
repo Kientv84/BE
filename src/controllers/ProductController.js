@@ -148,10 +148,25 @@ const getAllType = async (req, res) => {
   }
 };
 
+const removeVietnameseTones = (str) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu tiếng Việt
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/[^a-zA-Z0-9 ]/g, "") // Loại bỏ ký tự đặc biệt
+    .trim();
+};
+
 const getAllsearchProducts = async (req, res) => {
   try {
     const keyword = req.query.q; // Lấy từ khóa tìm kiếm từ query string
-    const response = await ProductService.searchProducts(keyword);
+    const normalizedKeyword = removeVietnameseTones(keyword.toLowerCase());
+
+    const response = await ProductService.searchProducts(
+      keyword,
+      normalizedKeyword
+    );
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({

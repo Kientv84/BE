@@ -230,21 +230,21 @@ const getAllType = () => {
   });
 };
 
-const searchProducts = (keyword) => {
+const searchProducts = (keyword, normalizedKeyword) => {
   return new Promise(async (resolve, reject) => {
     try {
       // Tìm kiếm sản phẩm mà tên hoặc mô tả chứa từ khóa
       const products = await Product.find({
         $or: [
-          { name: { $regex: keyword, $options: "i" } }, // Tìm kiếm trong tên sản phẩm (không phân biệt hoa thường)
-          { type: { $regex: keyword, $options: "i" } },
-          { branch: { $regex: keyword, $options: "i" } },
+          // Tìm kiếm trong tên sản phẩm (không phân biệt hoa thường)
+          { name: { $regex: new RegExp(keyword, "i") } }, // Tìm kiếm với từ khóa có dấu
+          { name: { $regex: new RegExp(normalizedKeyword, "i") } }, // Tìm kiếm với từ khóa không dấu
         ],
       });
       resolve({
         status: "OK",
         message: "Success",
-        data: products, // Trả về danh sách các sản phẩm liên quan
+        data: products,
       });
     } catch (e) {
       reject(e);
