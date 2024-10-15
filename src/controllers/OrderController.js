@@ -12,7 +12,6 @@ const createOrder = async (req, res) => {
       city,
       phone,
     } = req.body;
-    // console.log('req,body', req.body)
     if (
       !paymentMethod ||
       !itemsPrice ||
@@ -31,7 +30,6 @@ const createOrder = async (req, res) => {
     const response = await OrderService.createOrder(req.body);
     return res.status(200).json(response);
   } catch (e) {
-    // console.log('error')
     return res.status(404).json({
       message: e,
     });
@@ -73,26 +71,6 @@ const getDetailsOrder = async (req, res) => {
     });
   }
 };
-
-// const cancelOrderDetails = async (req, res) => {
-//   try {
-//     const orderId = req.params.id;
-//     const data = req.body;
-//     // console.log('orderId', orderId, data, {data})
-//     if (!orderId) {
-//       return res.status(200).json({
-//         status: "ERR",
-//         message: "The Order Id is not exist",
-//       });
-//     }
-//     const response = await OrderService.cancelOrderDetails(orderId, data);
-//     return res.status(200).json(response);
-//   } catch (e) {
-//     return res.status(404).json({
-//       message: e,
-//     });
-//   }
-// };
 
 const cancelOrderDetails = async (req, res) => {
   try {
@@ -138,7 +116,6 @@ const updateDeliveryState = async (req, res) => {
       });
     }
     const response = await OrderService.updateDeliveryState(orderId, data);
-    // console.log(response)
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
@@ -152,17 +129,18 @@ const updatePaymentState = async (req, res) => {
     const orderId = req.params.id;
     const data = req.body;
     if (!orderId) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "ERR",
-        message: "The order id is not exist",
+        message: "Order ID is missing or invalid",
       });
     }
+
     const response = await OrderService.updatePaymentState(orderId, data);
-    // console.log(response)
     return res.status(200).json(response);
   } catch (e) {
-    return res.status(404).json({
-      message: e,
+    return res.status(500).json({
+      status: "ERR",
+      message: `An error occurred: ${e.message}`,
     });
   }
 };
@@ -170,7 +148,6 @@ const updatePaymentState = async (req, res) => {
 const deleteOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
-    // console.log(orderId)
     if (!orderId) {
       return res.status(200).json({
         status: "ERR",

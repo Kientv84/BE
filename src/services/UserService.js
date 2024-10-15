@@ -88,7 +88,6 @@ const updateUser = (id, data) => {
       const checkUser = await User.findById({
         _id: id,
       });
-      // console.log('checkUser', checkUser)
       if (checkUser === null) {
         resolve({
           status: "ERR",
@@ -97,7 +96,6 @@ const updateUser = (id, data) => {
       }
 
       const updateUser = await User.findByIdAndUpdate(id, data, { new: true });
-      // console.log('updateUser', updateUser)
 
       resolve({
         status: "OK",

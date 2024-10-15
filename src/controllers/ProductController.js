@@ -148,6 +148,18 @@ const getAllType = async (req, res) => {
   }
 };
 
+const getAllsearchProducts = async (req, res) => {
+  try {
+    const keyword = req.query.q; // Lấy từ khóa tìm kiếm từ query string
+    const response = await ProductService.searchProducts(keyword);
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(404).json({
+      message: e.message || "An error occurred",
+    });
+  }
+};
+
 const getAllBranch = async (req, res) => {
   try {
     const response = await ProductService.getAllBranch();
@@ -168,4 +180,5 @@ module.exports = {
   deleteMany,
   getAllType,
   getAllBranch,
+  getAllsearchProducts,
 };
