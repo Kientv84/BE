@@ -15,5 +15,6 @@ router.get("/get-all", productController.getAllProduct);
 router.post("/delete-many", authMiddleWare, productController.deleteMany);
 router.get("/get-all-type", productController.getAllType);
 router.get("/get-all-branch", productController.getAllBranch);
+router.get("/catalogsearch/result", productController.getAllsearchProducts);
 
 module.exports = router;

@@ -26,23 +26,31 @@ const createProduct = async (req, res) => {
       !price ||
       !countInStock ||
       !rating ||
-      !discount ||
+      discount === undefined || // Chấp nhận `0` nhưng không để trống
       !description ||
       !promotion ||
       !image1 ||
       !image2
     ) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "ERR",
         message: "All input fields are required.",
       });
     }
 
-    const response = await ProductService.createProduct(req.body);
+    // Tạo trường normalizedName
+    const normalizedName = removeVietnameseTones(name.toLowerCase());
+
+    const newProductData = {
+      ...req.body,
+      normalizedName,
+    };
+
+    const response = await ProductService.createProduct(newProductData);
     return res.status(200).json(response);
   } catch (e) {
-    return res.status(404).json({
-      message: e,
+    return res.status(500).json({
+      message: e.message || "An error occurred while creating the product.",
     });
   }
 };
@@ -57,6 +65,11 @@ const updateProduct = async (req, res) => {
         message: "The product id is not exist",
       });
     }
+
+    if (data.name) {
+      data.normalizedName = removeVietnameseTones(data.name.toLowerCase());
+    }
+
     const response = await ProductService.updateProduct(productId, data);
     return res.status(200).json(response);
   } catch (e) {
@@ -148,6 +161,29 @@ const getAllType = async (req, res) => {
   }
 };
 
+const removeVietnameseTones = (str) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu tiếng Việt
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/[^a-zA-Z0-9 ]/g, "") // Loại bỏ ký tự đặc biệt
+    .trim();
+};
+
+const getAllsearchProducts = async (req, res) => {
+  try {
+    const keyword = req.query.q; // Lấy từ khóa tìm kiếm từ query string
+
+    const response = await ProductService(keyword);
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(404).json({
+      message: e.message || "An error occurred",
+    });
+  }
+};
+
 const getAllBranch = async (req, res) => {
   try {
     const response = await ProductService.getAllBranch();
@@ -168,4 +204,5 @@ module.exports = {
   deleteMany,
   getAllType,
   getAllBranch,
+  getAllsearchProducts,
 };
