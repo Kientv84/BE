@@ -15,11 +15,28 @@ const productSchema = new mongoose.Schema(
     promotion: { type: String },
     discount: { type: Number },
     selled: { type: Number },
+    normalizedName: { type: String, required: true },
   },
   {
     timestamps: true,
   }
 );
+
+productSchema.pre("save", function (next) {
+  this.normalizedName = removeVietnameseTones(this.name.toLowerCase());
+  next();
+});
+
+// Hàm chuẩn hóa tên sản phẩm (loại bỏ dấu tiếng Việt)
+const removeVietnameseTones = (str) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .trim();
+};
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;
