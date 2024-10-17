@@ -193,6 +193,13 @@ const getAllProduct = (limit, page, sort, filter) => {
           .skip(page * limit)
           .sort({ createdAt: -1, updatedAt: -1 });
       }
+      // Nếu không có `limit`, lấy toàn bộ sản phẩm
+      if (!limit) {
+        allProduct = await Product.find(query).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+      }
 
       resolve({
         status: "OK",
