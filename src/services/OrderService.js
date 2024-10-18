@@ -240,6 +240,21 @@ const updateDeliveryState = (orderId, data) => {
           message: "The order is not defined",
         });
       }
+      // Kiểm tra trạng thái hợp lệ trước khi cập nhật
+      const validStatuses = [
+        "not shipped",
+        "pending",
+        "shipped",
+        "delivered",
+        "cancelled",
+      ];
+      if (!validStatuses.includes(data.isDelivered)) {
+        resolve({
+          status: "ERR",
+          message: "Invalid delivery status",
+        });
+      }
+
       const updateOrder = await Order.findByIdAndUpdate(orderId, data, {
         new: true,
       });

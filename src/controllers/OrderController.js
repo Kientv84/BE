@@ -115,6 +115,15 @@ const updateDeliveryState = async (req, res) => {
         message: "The order id is not exist",
       });
     }
+
+    // Kiểm tra xem dữ liệu gửi lên có chứa isDelivered hay không
+    if (!data.isDelivered) {
+      return res.status(400).json({
+        status: "ERR",
+        message: "Delivery status is required",
+      });
+    }
+
     const response = await OrderService.updateDeliveryState(orderId, data);
     return res.status(200).json(response);
   } catch (e) {
