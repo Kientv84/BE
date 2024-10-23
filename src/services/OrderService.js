@@ -19,6 +19,8 @@ const createOrder = (newOrder) => {
       paidAt,
       email,
     } = newOrder;
+
+    const orderNumber = `#${Date.now().toString().slice(-5)}`;
     try {
       const promises = orderItems.map(async (order) => {
         const productData = await Product.findOneAndUpdate(
@@ -60,6 +62,7 @@ const createOrder = (newOrder) => {
         });
       } else {
         const createdOrder = await Order.create({
+          orderNumber,
           orderItems,
           shippingAddress: {
             fullName,
@@ -211,7 +214,7 @@ const getAllOrder = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const allOrder = await Order.find().select(
-        "_id shippingAddress paymentMethod totalPrice isPaid isDelivered"
+        "_id orderNumber orderItems.name shippingAddress paymentMethod totalPrice isPaid isDelivered createdAt"
       );
       resolve({
         status: "OK",
@@ -242,11 +245,12 @@ const updateDeliveryState = (orderId, data) => {
       }
       // Kiểm tra trạng thái hợp lệ trước khi cập nhật
       const validStatuses = [
-        "not shipped",
+        "successful order",
         "pending",
-        "shipped",
-        "delivered",
-        "cancelled",
+        "sended",
+        "shipping",
+        "delivery success",
+        "delivery fail",
       ];
       if (!validStatuses.includes(data.isDelivered)) {
         resolve({
@@ -255,9 +259,33 @@ const updateDeliveryState = (orderId, data) => {
         });
       }
 
-      const updateOrder = await Order.findByIdAndUpdate(orderId, data, {
-        new: true,
-      });
+      const updateFields = {};
+      if (data.isDelivered === "pending") {
+        updateFields.pendingAt = new Date();
+      } else if (data.isDelivered === "sended") {
+        updateFields.sendedAt = new Date();
+      } else if (data.isDelivered === "shipping") {
+        updateFields.shippingAt = new Date();
+      } else if (data.isDelivered === "delivery success") {
+        updateFields.deliverySuccessAt = new Date();
+      } else if (data.isDelivered === "delivery fail") {
+        updateFields.deliveryFailAt = new Date();
+      }
+
+      // const updateOrder = await Order.findByIdAndUpdate(orderId, data, {
+      //   new: true,
+      // });
+
+      const updateOrder = await Order.findByIdAndUpdate(
+        orderId,
+        {
+          ...data,
+          ...updateFields,
+        },
+        {
+          new: true,
+        }
+      );
 
       resolve({
         status: "OK",

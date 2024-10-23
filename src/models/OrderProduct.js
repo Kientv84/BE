@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
+    orderNumber: { type: String, required: true, unique: true },
     orderItems: [
       {
         name: { type: String, required: true },
@@ -29,13 +30,23 @@ const orderSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
-    // isDelivered: { type: Boolean, default: false },
     isDelivered: {
       type: String,
-      enum: ["not shipped", "pending", "shipped", "delivered", "cancelled"],
-      default: "not shipped",
+      enum: [
+        "successful order",
+        "pending",
+        "sended",
+        "shipping",
+        "delivery success",
+        "delivery fail",
+      ],
+      default: "successful order",
     },
-    deliveredAt: { type: Date },
+    pendingAt: { type: Date }, // Thời gian khi đơn hàng chuyển sang "pending"
+    sendedAt: { type: Date }, // Thời gian khi đơn hàng chuyển sang "sended"
+    shippingAt: { type: Date }, // Thời gian khi đơn hàng chuyển sang "shipping"
+    deliverySuccessAt: { type: Date }, // Thời gian giao hàng thành công
+    deliveryFailAt: { type: Date },
   },
   {
     timestamps: true,
