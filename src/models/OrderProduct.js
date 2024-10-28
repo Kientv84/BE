@@ -33,6 +33,7 @@ const orderSchema = new mongoose.Schema(
     isDelivered: {
       type: String,
       enum: [
+        "cancelled",
         "successful order",
         "pending",
         "sended",
@@ -42,10 +43,11 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "successful order",
     },
-    pendingAt: { type: Date }, // Thời gian khi đơn hàng chuyển sang "pending"
-    sendedAt: { type: Date }, // Thời gian khi đơn hàng chuyển sang "sended"
-    shippingAt: { type: Date }, // Thời gian khi đơn hàng chuyển sang "shipping"
-    deliverySuccessAt: { type: Date }, // Thời gian giao hàng thành công
+    cancelledAt: { type: Date },
+    pendingAt: { type: Date },
+    sendedAt: { type: Date },
+    shippingAt: { type: Date },
+    deliverySuccessAt: { type: Date },
     deliveryFailAt: { type: Date },
   },
   {
