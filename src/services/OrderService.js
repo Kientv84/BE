@@ -166,15 +166,19 @@ const cancelOrderDetails = (id, data) => {
         );
 
         if (productData) {
-          const deletedOrder = await Order.findByIdAndDelete(id);
-          if (!deletedOrder) {
+          const updatedOrder = await Order.findByIdAndUpdate(
+            id,
+            { isDelivered: "cancelled", cancelledAt: new Date() },
+            { new: true }
+          );
+          if (!updatedOrder) {
             resolve({
               status: "ERR",
               message: "The Order is not defined",
             });
             return; // Dừng lại nếu không tìm thấy order
           }
-          return deletedOrder; // Trả về kết quả đã xóa
+          return updatedOrder; // Trả về kết quả đã xóa
         } else {
           return {
             status: "ERR",
@@ -245,6 +249,7 @@ const updateDeliveryState = (orderId, data) => {
       }
       // Kiểm tra trạng thái hợp lệ trước khi cập nhật
       const validStatuses = [
+        "cancelled",
         "successful order",
         "pending",
         "sended",
@@ -270,6 +275,8 @@ const updateDeliveryState = (orderId, data) => {
         updateFields.deliverySuccessAt = new Date();
       } else if (data.isDelivered === "delivery fail") {
         updateFields.deliveryFailAt = new Date();
+      } else if (data.isDelivered === "cancelled") {
+        updateFields.cancelledAt = new Date(); // Đảm bảo cancelledAt được cập nhật
       }
 
       // const updateOrder = await Order.findByIdAndUpdate(orderId, data, {
@@ -293,6 +300,7 @@ const updateDeliveryState = (orderId, data) => {
         data: {
           isDelivered: updateOrder.isDelivered,
           isPaid: updateOrder.isPaid,
+          cancelledAt: updateOrder.cancelledAt,
         },
       });
     } catch (error) {
