@@ -124,6 +124,7 @@ const getDetailsOrder = (id) => {
       const order = await Order.findById({
         _id: id,
       });
+
       if (order === null) {
         resolve({
           status: "ERR",
@@ -278,10 +279,6 @@ const updateDeliveryState = (orderId, data) => {
       } else if (data.isDelivered === "cancelled") {
         updateFields.cancelledAt = new Date(); // Đảm bảo cancelledAt được cập nhật
       }
-
-      // const updateOrder = await Order.findByIdAndUpdate(orderId, data, {
-      //   new: true,
-      // });
 
       const updateOrder = await Order.findByIdAndUpdate(
         orderId,

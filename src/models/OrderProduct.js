@@ -10,6 +10,7 @@ const orderSchema = new mongoose.Schema(
         image: { type: String, required: true },
         price: { type: Number, required: true },
         discount: { type: Number },
+        branch: { type: String, required: true },
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",

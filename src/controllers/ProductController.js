@@ -132,6 +132,23 @@ const getAllProduct = async (req, res) => {
   }
 };
 
+const getAllSearch = async (req, res) => {
+  try {
+    const { limit, page, sort, filter } = req.query;
+    const response = await ProductService.getAllSearch(
+      Number(limit) || null,
+      Number(page) || 0,
+      sort,
+      filter
+    );
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 const deleteMany = async (req, res) => {
   try {
     const ids = req.body.ids;
@@ -205,4 +222,5 @@ module.exports = {
   getAllType,
   getAllBranch,
   getAllsearchProducts,
+  getAllSearch,
 };
