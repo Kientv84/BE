@@ -218,6 +218,68 @@ const getAllProduct = (limit, page, sort, filter) => {
   });
 };
 
+const getAllSearch = (limit, page, sort, filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let query = {}; // Khởi tạo đối tượng query rỗng
+
+      // Nếu có filter, áp dụng bộ lọc tìm kiếm
+      if (filter) {
+        const label = filter[0];
+        const keyword = filter[1];
+        query = {
+          $or: [
+            { [label]: { $regex: keyword, $options: "i" } },
+            { normalizedName: { $regex: keyword, $options: "i" } },
+          ],
+        };
+      }
+
+      const totalProduct = await Product.countDocuments(query); // Đếm số sản phẩm với bộ lọc hiện tại
+
+      let allProduct = [];
+
+      // Xử lý sắp xếp nếu có yêu cầu
+      if (sort) {
+        const objectSort = {};
+        objectSort[sort[1]] = sort[0];
+        allProduct = await Product.find(query)
+          .limit(limit)
+          .skip(page * limit)
+          .sort(objectSort)
+          .sort({ createdAt: -1, updatedAt: -1 }); // Sắp xếp theo createdAt và updatedAt
+      } else {
+        // Nếu không có yêu cầu sắp xếp
+        allProduct = await Product.find(query)
+          .limit(limit)
+          .skip(page * limit)
+          .sort({ createdAt: -1, updatedAt: -1 });
+      }
+      // Nếu không có `limit`, lấy toàn bộ sản phẩm
+      if (!limit) {
+        allProduct = await Product.find(query).sort({
+          createdAt: -1,
+          updatedAt: -1,
+        });
+      }
+
+      resolve({
+        status: "OK",
+        message: "Success",
+        data: allProduct,
+        total: totalProduct,
+        pageCurrent: Number(page + 1),
+        totalPage: Math.ceil(totalProduct / limit), // Tính số trang dựa trên tổng sản phẩm và giới hạn
+      });
+    } catch (e) {
+      reject({
+        status: "ERROR",
+        message: e.message || "Something went wrong!",
+      });
+    }
+  });
+};
+
 const deleteManyProduct = (ids) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -271,4 +333,5 @@ module.exports = {
   deleteManyProduct,
   getAllType,
   getAllBranch,
+  getAllSearch,
 };
