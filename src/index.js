@@ -5,7 +5,6 @@ const routes = require("./routes");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const authRouter = require("./routes/authRouter");
 dotenv.config();
 
 require("./passport");
@@ -18,7 +17,6 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb" }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use("/api/auth", authRouter);
 
 routes(app);
 
