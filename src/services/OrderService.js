@@ -7,6 +7,7 @@ const createOrder = (newOrder) => {
     const {
       orderItems,
       paymentMethod,
+      typeofdelivery,
       itemsPrice,
       shippingPrice,
       totalPrice,
@@ -71,6 +72,7 @@ const createOrder = (newOrder) => {
             phone,
           },
           paymentMethod,
+          typeofdelivery,
           itemsPrice,
           shippingPrice,
           totalPrice,
@@ -219,7 +221,7 @@ const getAllOrder = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const allOrder = await Order.find().select(
-        "_id orderNumber orderItems.name shippingAddress paymentMethod totalPrice isPaid isDelivered createdAt"
+        "_id orderNumber orderItems.name shippingAddress paymentMethod typeofdelivery totalPrice isPaid isDelivered createdAt"
       );
       resolve({
         status: "OK",
