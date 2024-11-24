@@ -15,7 +15,7 @@ const createUser = async (req, res) => {
     if (!email || !password || !confirmPassword) {
       return res.status(200).json({
         status: "ERR",
-        message: "The input is required",
+        message: "Please fill in both email, password, and confirm password!",
       });
     } else if (!isCheckEmail) {
       return res.status(200).json({
@@ -50,7 +50,7 @@ const loginUser = async (req, res) => {
     if (!email || !password) {
       return res.status(200).json({
         status: "ERR",
-        message: "The input is required",
+        message: "Please fill in both email and password!",
       });
     } else if (!isCheckEmail) {
       return res.status(200).json({
@@ -211,7 +211,7 @@ const forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(200).json({
         status: "ERR",
-        message: "The email does not exist",
+        message: "This email does not exist",
       });
     }
 
@@ -258,7 +258,7 @@ const resetPassword = async (req, res) => {
   if (!password) {
     return res.status(200).json({
       status: "ERR",
-      message: "The input is required",
+      message: "Please fill in password!",
     });
   } else if (password?.length < 8) {
     return res.status(200).json({
