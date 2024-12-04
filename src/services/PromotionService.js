@@ -15,18 +15,53 @@ const createPromotion = (newPromotion) => {
 
     try {
       // Kiểm tra xem đã tồn tại khuyến mãi cho tháng, năm, và thương hiệu này chưa
-      const existingPromotion = await Promotion.findOne({
-        month,
-        year,
-        branch,
-        triggerProduct,
-      });
+      let queryConditions = {};
 
+      // Kiểm tra các trường nếu có giá trị
+      if (triggerProduct) queryConditions.triggerProduct = triggerProduct;
+      if (month) queryConditions.month = month;
+      if (year) queryConditions.year = year;
+      if (branch) queryConditions.branch = branch;
+
+      // Tìm khuyến mãi có cùng các điều kiện trên
+      const existingPromotion = await Promotion.findOne(queryConditions);
+
+      // Nếu có khuyến mãi trùng với điều kiện trên, từ chối việc tạo mới
       if (existingPromotion) {
         return reject({
           status: "ERR",
           message:
             "A promotion for this month, year, branch, and trigger product already exists.",
+        });
+      }
+
+      // Kiểm tra nếu triggerProduct có trong bundleProduct
+      if (bundleProduct && bundleProduct.length > 0) {
+        const isTriggerInBundle = bundleProduct.some(
+          (bundle) => bundle.productId === triggerProduct
+        );
+
+        if (isTriggerInBundle) {
+          return reject({
+            status: "ERR",
+            message:
+              "Trigger product cannot be the same as any product in the bundle.",
+          });
+        }
+      }
+
+      // Kiểm tra xem có sản phẩm trùng trong bundleProduct không
+      const isDuplicateInBundle = bundleProduct.some((bundle, index) =>
+        bundleProduct.some(
+          (otherBundle, otherIndex) =>
+            otherIndex !== index && bundle.productId === otherBundle.productId
+        )
+      );
+
+      if (isDuplicateInBundle) {
+        return reject({
+          status: "ERR",
+          message: "Duplicate products found in the bundle.",
         });
       }
 
@@ -41,11 +76,11 @@ const createPromotion = (newPromotion) => {
       };
 
       // Nếu có `bundleProduct` và `discountPrice`, thêm `bundleProduct` vào dữ liệu khuyến mãi
-      if (bundleProduct && discountPrice) {
-        promotionData.bundleProduct = {
-          productId: bundleProduct,
+      if (Array.isArray(bundleProduct) && bundleProduct.length > 0) {
+        promotionData.bundleProduct = bundleProduct.map((bundle) => ({
+          productId: bundle.productId,
           discountPrice: discountPrice,
-        };
+        }));
       }
 
       // Tạo khuyến mãi mới
@@ -80,11 +115,62 @@ const updatePromotion = (id, data) => {
         });
       }
 
-      if (typeof data.bundleProduct === "string") {
-        data.bundleProduct = {
-          productId: data.bundleProduct,
-          discountPrice: checkPromotion.bundleProduct.discountPrice || 0, // Giữ lại giá trị cũ hoặc gán mặc định nếu không có
-        };
+      // Kiểm tra sự trùng lặp trong dữ liệu cập nhật (bao gồm triggerProduct, month, year, branch)
+      let queryConditions = {}; // Dùng data.triggerProduct thay vì triggerProduct
+
+      // Chỉ kiểm tra các trường month, year, branch nếu có giá trị trong data
+      if (data.triggerProduct)
+        queryConditions.triggerProduct = data.triggerProduct;
+      if (data.month) queryConditions.month = data.month;
+      if (data.year) queryConditions.year = data.year;
+      if (data.branch) queryConditions.branch = data.branch;
+
+      // Loại trừ bản ghi hiện tại (đang được cập nhật)
+      queryConditions._id = { $ne: id };
+
+      const existingPromotion = await Promotion.findOne(queryConditions);
+
+      if (existingPromotion) {
+        return reject({
+          status: "ERR",
+          message:
+            "A promotion for this month, year, branch, and trigger product already exists.",
+        });
+      }
+
+      if (data.bundleProduct && data.bundleProduct.length > 0) {
+        const isTriggerInBundle = data.bundleProduct.some(
+          (bundle) => bundle.productId === data.triggerProduct
+        );
+
+        if (isTriggerInBundle) {
+          return reject({
+            status: "ERR",
+            message:
+              "Trigger product cannot be the same as any product in the bundle.",
+          });
+        }
+      }
+
+      const isDuplicateInBundle = data.bundleProduct.some((bundle, index) =>
+        data.bundleProduct.some(
+          (otherBundle, otherIndex) =>
+            otherIndex !== index && bundle.productId === otherBundle.productId
+        )
+      );
+
+      if (isDuplicateInBundle) {
+        return reject({
+          status: "ERR",
+          message: "Duplicate products found in the bundle.",
+        });
+      }
+
+      if (Array.isArray(data.bundleProduct)) {
+        data.bundleProduct = data.bundleProduct.map((item) => ({
+          productId: item.productId,
+          discountPrice: item.discountPrice || 0, // Gán giá trị mặc định nếu discountPrice không có
+        }));
       }
 
       const updatePromotion = await Promotion.findByIdAndUpdate(id, data, {

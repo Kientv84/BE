@@ -8,10 +8,12 @@ const promotionSchema = new mongoose.Schema(
     branch: { type: String, default: null },
     minimumQuantity: { type: Number, default: 2 },
     triggerProduct: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-    bundleProduct: {
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" }, // Sản phẩm mua kèm
-      discountPrice: { type: Number }, // Giá giảm cho sản phẩm mua kèm
-    },
+    bundleProduct: [
+      {
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" }, // Sản phẩm mua kèm
+        discountPrice: { type: Number }, // Giá giảm cho sản phẩm mua kèm
+      },
+    ],
   },
   {
     timestamps: true,
