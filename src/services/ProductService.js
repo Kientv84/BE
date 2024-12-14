@@ -27,6 +27,15 @@ const createProduct = (newProduct) => {
         });
       }
 
+      const promotionData = promotion
+        ? {
+            promotionText: promotion.promotionText || "",
+            ...(promotion.relatedProductId
+              ? { relatedProductId: promotion.relatedProductId }
+              : {}),
+          }
+        : null;
+
       const normalizedName = removeVietnameseTones(name.toLowerCase());
       const newProduct = await Product.create({
         name,
@@ -40,7 +49,7 @@ const createProduct = (newProduct) => {
         countInStock: Number(countInStock),
         rating,
         description,
-        promotion,
+        promotion: promotionData,
         discount: Number(discount),
       });
 

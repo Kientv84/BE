@@ -28,7 +28,8 @@ const createProduct = async (req, res) => {
       !rating ||
       discount === undefined || // Chấp nhận `0` nhưng không để trống
       !description ||
-      !promotion ||
+      // !promotion ||
+      !(promotion && promotion.promotionText) || // Kiểm tra promotion tồn tại trước
       !image1 ||
       !image2
     ) {
