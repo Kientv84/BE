@@ -12,14 +12,15 @@ const productSchema = new mongoose.Schema(
     countInStock: { type: Number, required: true },
     rating: { type: Number, required: true },
     description: { type: String },
-    // promotion: { type: String },
-    promotion: {
-      promotionText: { type: String }, // Nội dung hiển thị cho khuyến mãi
-      relatedProductId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-      }, // ID sản phẩm liên quan
-    },
+    promotion: [
+      {
+        promotionText: { type: String, required: true }, // Nội dung hiển thị cho khuyến mãi
+        relatedProductId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        }, // ID sản phẩm liên quan
+      },
+    ],
     discount: { type: Number },
     selled: { type: Number },
     normalizedName: { type: String, required: true },

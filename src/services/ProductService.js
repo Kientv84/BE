@@ -27,14 +27,14 @@ const createProduct = (newProduct) => {
         });
       }
 
-      const promotionData = promotion
-        ? {
-            promotionText: promotion.promotionText || "",
-            ...(promotion.relatedProductId
-              ? { relatedProductId: promotion.relatedProductId }
+      const promotionData = Array.isArray(promotion)
+        ? promotion.map((promo) => ({
+            promotionText: promo.promotionText || "",
+            ...(promo.relatedProductId
+              ? { relatedProductId: promo.relatedProductId }
               : {}),
-          }
-        : null;
+          }))
+        : [];
 
       const normalizedName = removeVietnameseTones(name.toLowerCase());
       const newProduct = await Product.create({
@@ -73,7 +73,7 @@ const updateProduct = (id, data) => {
         _id: id,
       });
       if (checkProduct === null) {
-        resolve({
+        return resolve({
           status: "ERR",
           message: "The product is not defined",
         });
@@ -83,6 +83,18 @@ const updateProduct = (id, data) => {
       if (data.name) {
         data.normalizedName = removeVietnameseTones(data.name.toLowerCase());
       }
+
+      // Kiểm tra và cập nhật promotion
+      if (data.promotion && Array.isArray(data.promotion)) {
+        data.promotion = data.promotion.map((item, index) => ({
+          promotionText: item.promotionText || "",
+          relatedProductId:
+            item.relatedProductId !== undefined
+              ? item.relatedProductId
+              : checkProduct.promotion[index]?.relatedProductId || null,
+        }));
+      }
+
       const updateProduct = await Product.findByIdAndUpdate(id, data, {
         new: true,
       });

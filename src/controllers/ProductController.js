@@ -28,14 +28,24 @@ const createProduct = async (req, res) => {
       !rating ||
       discount === undefined || // Chấp nhận `0` nhưng không để trống
       !description ||
-      // !promotion ||
-      !(promotion && promotion.promotionText) || // Kiểm tra promotion tồn tại trước
+      !promotion ||
       !image1 ||
       !image2
     ) {
       return res.status(400).json({
         status: "ERR",
         message: "All input fields are required.",
+      });
+    }
+
+    // Kiểm tra từng phần tử của promotion xem có `promotionText` hay không
+    const invalidPromotion = promotion.some(
+      (promo) => !promo.promotionText || promo.promotionText.trim() === ""
+    );
+    if (invalidPromotion) {
+      return res.status(400).json({
+        status: "ERR",
+        message: "Each promotion must have a valid promotionText.",
       });
     }
 
@@ -60,6 +70,7 @@ const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const data = req.body;
+
     if (!productId) {
       return res.status(200).json({
         status: "ERR",

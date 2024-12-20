@@ -109,7 +109,7 @@ const updatePromotion = (id, data) => {
         _id: id,
       });
       if (checkPromotion === null) {
-        resolve({
+        return resolve({
           status: "ERR",
           message: "The promotion is not defined",
         });
